@@ -185,8 +185,8 @@ ifneq ($(strip $(TARGET_BUILD_APPS)),)
   $(call import-products,$(call get-product-makefiles,\
       $(SRC_TARGET_DIR)/product/AndroidProducts.mk))
 else
-  ifneq ($(CM_BUILD),)
-    $(call import-products, device/*/$(CM_BUILD)/cm.mk)
+  ifneq ($(OSR_BUILD),)
+    $(call import-products, device/*/$(OSR_BUILD)/osr.mk)
   else
   # Read in all of the product definitions specified by the AndroidProducts.mk
     # files in the tree.
