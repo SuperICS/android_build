@@ -59,12 +59,12 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^osr_") ; then
-       OSR_BUILD=$(echo -n $1 | sed -e 's/^osr_//g')
+    if (echo -n $1 | grep -q -e "^cm_") ; then
+       CM_BUILD=$(echo -n $1 | sed -e 's/^cm_//g')
     else
-       OSR_BUILD=
+       CM_BUILD=
     fi
-    export OSR_BUILD
+    export CM_BUILD
 
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
@@ -415,7 +415,7 @@ function print_lunch_menu()
        echo "  (ohai, koush!)"
     fi
     echo
-    if [ "z${OSR_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${CM_DEVICES_ONLY}" != "z" ]; then
        echo "Breakfast menu... pick a combo:"
     else
        echo "Lunch menu... pick a combo:"
@@ -429,7 +429,7 @@ function print_lunch_menu()
         i=$(($i+1))
     done
 
-    if [ "z${OSR_DEVICES_ONLY}" != "z" ]; then
+    if [ "z${CM_DEVICES_ONLY}" != "z" ]; then
        echo "... and don't forget the bacon!"
     fi
 
@@ -451,10 +451,10 @@ function brunch()
 function breakfast()
 {
     target=$1
-    OSR_DEVICES_ONLY="true"
+    CM_DEVICES_ONLY="true"
     unset LUNCH_MENU_CHOICES
     add_lunch_combo full-eng
-    for f in `/bin/ls vendor/osr/vendorsetup.sh 2> /dev/null`
+    for f in `/bin/ls vendor/cm/vendorsetup.sh 2> /dev/null`
         do
             echo "including $f"
             . $f
@@ -470,8 +470,8 @@ function breakfast()
             # A buildtype was specified, assume a full device name
             lunch $target
         else
-            # This is probably just the OSR model name
-            lunch osr_$target-userdebug
+            # This is probably just the CM model name
+            lunch cm_$target-userdebug
         fi
     fi
     return $?
@@ -520,7 +520,7 @@ function lunch()
     check_product $product
    # if [ $? -ne 0 ]
    # then
-       # if we can't find a product, try to grab it off the OSR github
+       # if we can't find a product, try to grab it off the CM github
        # T=$(gettop)
        # pushd $T > /dev/null
        # build/tools/roomservice.py $product
