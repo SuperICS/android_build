@@ -192,7 +192,7 @@ else
     # files in the tree.
     #
     #TODO: when we start allowing direct pointers to product files,
-    #    guarantee that they're in this list.
+    # guarantee that they're in this list.
     $(call import-products, $(get-all-product-makefiles))
   endif
 endif # TARGET_BUILD_APPS
