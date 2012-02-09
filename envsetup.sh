@@ -55,19 +55,6 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^cm_") ; then
-       CM_BUILD=$(echo -n $1 | sed -e 's/^cm_//g')
-       NAM_VARIANT=$(echo -n $1 | sed -e 's/^cm_//g')
-    elif (echo -n $1 | grep -q -e "htc_") ; then
-       CM_BUILD=
-       NAM_VARIANT=$(echo -n $1)
-    else 
-       CM_BUILD=
-       NAM_VARIANT=
-    fi
-    export CM_BUILD
-    export NAM_VARIANT
-
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
@@ -405,18 +392,10 @@ function add_lunch_combo()
 
 function print_lunch_menu()
 {
-    local uname=$(uname)
     echo
-    echo "You're building on" $uname
-    if [ "$(uname)" = "Darwin" ] ; then
-       echo "  (ohai, koush!)"
-    fi
+    echo "You're building on" $(uname)
     echo
-    if [ "z${CM_DEVICES_ONLY}" != "z" ]; then
-       echo "Breakfast menu... pick a combo:"
-    else
-       echo "Lunch menu... pick a combo:"
-    fi
+    echo "Lunch menu... pick a combo:"
 
     local i=1
     local choice
@@ -425,10 +404,6 @@ function print_lunch_menu()
         echo "     $i. $choice"
         i=$(($i+1))
     done
-
-    if [ "z${CM_DEVICES_ONLY}" != "z" ]; then
-       echo "... and don't forget the bacon!"
-    fi
 
     echo
 }
@@ -466,10 +441,53 @@ function lunch()
 
     export TARGET_BUILD_APPS=
 
+    local product=$(echo -n $selection | sed -e "s/-.*$//")
+    check_product $product
+    if [ $? -ne 0 ]
+    then
+        echo
+        echo "** Don't have a product spec for: '$product'"
+        echo "** Do you have the right repo manifest?"
+        product=
+    fi
+
+    local variant=$(echo -n $selection | sed -e "s/^[^\-]*-//")
+    check_variant $variant
+    if [ $? -ne 0 ]
+    then
+        echo
+        echo "** Invalid variant: '$variant'"
+        echo "** Must be one of ${VARIANT_CHOICES[@]}"
+        variant=
+    fi
+
+    if [ -z "$product" -o -z "$variant" ]
+    then
+        echo
+        return 1
+    fi
+
+    export TARGET_PRODUCT=$product
+    export TARGET_BUILD_VARIANT=$variant
+    export TARGET_BUILD_TYPE=release
+
     echo
     set_stuff_for_environment
     printconfig
 }
+
+# Tab completion for lunch.
+function _lunch()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    COMPREPLY=( $(compgen -W "${LUNCH_MENU_CHOICES[*]}" -- ${cur}) )
+    return 0
+}
+complete -F _lunch lunch
 
 function gettop
 {

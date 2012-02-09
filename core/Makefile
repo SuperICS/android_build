@@ -1248,17 +1248,9 @@ else
     OTA_FROM_TARGET_SCRIPT := $(TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT)
 endif
 
-ifneq ($(CM_BUILD),)
-    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
-else
-    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
-endif
+$(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
 
-ifneq ($(NAM_VARIANT),)
-    $(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := true
-else
-    $(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := false
-endif
+$(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := false
 
 ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
     $(INTERNAL_OTA_PACKAGE_TARGET): override_device := auto
@@ -1279,6 +1271,10 @@ ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
 	$(TARGET_CUSTOM_RELEASETOOL)
 endif
 
+.PHONY: otapackage
+otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
+bacon: otapackage
+
 .PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
@@ -1286,7 +1282,7 @@ ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
 	@echo "Running releasetool"
 	$(hide) $(TARGET_CUSTOM_RELEASETOOL)
 else
-	$(hide) ./vendor/cm/tools/squisher
+	$(hide) ./vendor/SuperTeam/tools/squisher
 endif
 
 # -----------------------------------------------------------------
