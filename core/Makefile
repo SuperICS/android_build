@@ -1266,10 +1266,6 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	   --backup=$(backuptool) \
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
-ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
-	@echo "Running releasetool"
-	$(TARGET_CUSTOM_RELEASETOOL)
-endif
 
 .PHONY: otapackage
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
@@ -1278,12 +1274,6 @@ bacon: otapackage
 .PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
-ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
-	@echo "Running releasetool"
-	$(hide) $(TARGET_CUSTOM_RELEASETOOL)
-else
-	$(hide) ./vendor/SuperTeam/tools/squisher
-endif
 
 # -----------------------------------------------------------------
 # The update package
