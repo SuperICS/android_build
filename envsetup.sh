@@ -59,12 +59,19 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^cm_") ; then
-       CM_BUILD=$(echo -n $1 | sed -e 's/^cm_//g')
+    if (echo -n $1 | grep -q -e "^osr_") ; then
+       OSR_BUILD=$(echo -n $1 | sed -e 's/^cm_//g')
     else
-       CM_BUILD=
+       OSR_BUILD=
     fi
-    export CM_BUILD
+    export OSR_BUILD
+
+    if (echo -n $1 | grep -q -e "htc_") ; then
+        NAM_VARIANT=$(echo -n $1)
+    else
+        NAM_VARIANT=
+    fi
+    export NAM_VARIANT
 
     CALLED_FROM_SETUP=true BUILD_SYSTEM=build/core \
         TARGET_PRODUCT=$1 \
