@@ -224,7 +224,7 @@ function addcompletions()
     fi
 
     # Regenerated  build.prop
-    rm $ANDROID_PRODUCT_OUT/system/build.prop
+    rm -f $ANDROID_PRODUCT_OUT/system/build.prop
 
     dir="sdk/bash_completion"
     if [ -d ${dir} ]; then
