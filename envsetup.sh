@@ -223,6 +223,9 @@ function addcompletions()
         return
     fi
 
+    # Regenerated  build.prop
+    rm $ANDROID_PRODUCT_OUT/system/build.prop
+
     dir="sdk/bash_completion"
     if [ -d ${dir} ]; then
         for f in `/bin/ls ${dir}/[a-z]*.bash 2> /dev/null`; do
