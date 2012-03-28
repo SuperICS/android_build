@@ -29,7 +29,8 @@ endif
 # src:dest pair is the first one to match the same dest"
 #$(1): the src:dest pair
 define check-product-copy-files
-
+$(if $(filter %.apk, $(1)),$(error \
+    Prebuilt apk found in PRODUCT_COPY_FILES: $(1), use BUILD_PREBUILT instead!))
 endef
 unique_product_copy_files_destinations :=
 $(foreach cf,$(PRODUCT_COPY_FILES), \
@@ -157,6 +158,7 @@ $(INSTALLED_BUILD_PROP_TARGET): $(BUILDINFO_SH) $(INTERNAL_BUILD_ID_MAKEFILE) $(
 	@mkdir -p $(dir $@)
 	$(hide) TARGET_BUILD_TYPE="$(TARGET_BUILD_VARIANT)" \
 			TARGET_DEVICE="$(TARGET_DEVICE)" \
+			OSR_DEVICE="$(TARGET_DEVICE)" \
 			PRODUCT_NAME="$(TARGET_PRODUCT)" \
 			PRODUCT_BRAND="$(PRODUCT_BRAND)" \
 			PRODUCT_DEFAULT_LANGUAGE="$(call default-locale-language,$(PRODUCT_LOCALES))" \
@@ -1248,9 +1250,17 @@ else
     OTA_FROM_TARGET_SCRIPT := $(TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT)
 endif
 
-$(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
+ifneq ($(OSR_BUILD),)
+    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
+else
+    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
+endif
 
-$(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := false
+ifneq ($(NAM_VARIANT),)
+    $(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := true
+else
+    $(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := false
+endif
 
 ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
     $(INTERNAL_OTA_PACKAGE_TARGET): override_device := auto
@@ -1267,13 +1277,15 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-.PHONY: otapackage
-otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
-bacon: otapackage
-
 .PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
+ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
+	@echo "Running releasetool"
+	$(hide) $(TARGET_CUSTOM_RELEASETOOL)
+else
+	$(hide) ./vendor/osr/tools/squisher
+endif
 
 # -----------------------------------------------------------------
 # The update package
@@ -1308,32 +1320,6 @@ $(INTERNAL_UPDATE_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 
 .PHONY: updatepackage
 updatepackage: $(INTERNAL_UPDATE_PACKAGE_TARGET)
-
-# ------------------------------------------
-# Tarball of system/boot images for fastboot
-define build-fastboot_tarball-target
-    $(call pretty,"Target fastboot tarball: $(tarball_name)")
-    rm -f $(INTERNAL_FASTBOOT_TARBALL_TARGET)
-    tar --create --bzip2 \
-        --file=$(INTERNAL_FASTBOOT_TARBALL_TARGET) \
-        --directory=$(PRODUCT_OUT) \
-        system.img \
-        boot.img
-    $(call pretty,"Install fastboot tarball: $(INTERNAL_FASTBOOT_TARBALL_TARGET)")
-endef
-
-tarball_name := SuperOSR-$(PRODUCT_CODENAME)-$(PRODUCT_VERSION_MAJOR).$(PRODUCT_VERSION_MINOR).$(PRODUCT_VERSION_MAINTENANCE)-$(TARGET_DEVICE).tar.bz2
-
-INTERNAL_FASTBOOT_TARBALL_TARGET := $(PRODUCT_OUT)/$(tarball_name)
-
-$(INTERNAL_FASTBOOT_TARBALL_TARGET): \
-		$(INSTALLED_BOOTIMAGE_TARGET) \
-		$(INSTALLED_USERDATAIMAGE_TARGET) \
-		$(INSTALLED_SYSTEMIMAGE)
-	$(build-fastboot_tarball-target)
-
-.PHONY: fastboot_tarball
-fastboot_tarball: $(INTERNAL_FASTBOOT_TARBALL_TARGET)
 
 endif    # recovery_fstab is defined
 endif    # TARGET_NO_KERNEL != true

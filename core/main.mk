@@ -852,20 +852,12 @@ samplecode: $(sample_APKS_COLLECTION)
 findbugs: $(INTERNAL_FINDBUGS_HTML_TARGET) $(INTERNAL_FINDBUGS_XML_TARGET)
 
 .PHONY: clean
-dirs_to_clean := \
-	$(PRODUCT_OUT) \
-	$(TARGET_COMMON_OUT_ROOT)
 clean:
-	@for dir in $(dirs_to_clean) ; do \
-	echo "Cleaning $$dir..."; \
-	rm -rf $$dir; \
-	done
-	@echo "Clean."; \
+	@rm -rf $(OUT_DIR)/*
+	@echo "Entire build directory removed."
 
 .PHONY: clobber
-clobber:
-	@rm -rf $(OUT_DIR)
-	@echo "Entire build directory removed."
+clobber: clean
 
 # The rules for dataclean and installclean are defined in cleanbuild.mk.
 
