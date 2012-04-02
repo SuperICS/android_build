@@ -1250,12 +1250,6 @@ else
     OTA_FROM_TARGET_SCRIPT := $(TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT)
 endif
 
-ifneq ($(OSR_BUILD),)
-    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
-else
-    $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
-endif
-
 ifneq ($(NAM_VARIANT),)
     $(INTERNAL_OTA_PACKAGE_TARGET): modelidcfg := true
 else
