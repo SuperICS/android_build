@@ -75,7 +75,7 @@ $(info   BUILD_ID=$(BUILD_ID))
 $(info   BUILD_DISPLAY_ID=$(BUILD_ID))
 $(info   TARGET_DEVICE=$(TARGET_DEVICE))
 $(info   PRODUCT_OUT=$(PRODUCT_OUT))
-$(info   PRODUCT_NAME=$(PRODUCT_NAME))
+$(info   PRODUCT_ROM_FILE=$(PRODUCT_ROM_FILE))
 $(info   PRODUCT_LOCALES=$(PRODUCT_LOCALES))
 $(info ============================================)
 endif
