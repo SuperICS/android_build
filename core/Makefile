@@ -1235,7 +1235,7 @@ ifneq ($(recovery_fstab),)
 # -----------------------------------------------------------------
 # OTA update package
 
-name := $(PRODUCT_ROM_FILE)
+name := $(PRODUCT_ROM_FILE)-ota
 ifeq ($(TARGET_BUILD_TYPE),debug)
   name := $(name)_debug
 endif
