@@ -412,8 +412,10 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.Print("Formatting system")
   script.FormatPartition("/system")
   script.Mount("/system")
+  script.Mount("/data")
   script.Print("Installing SuperOSR")
   script.UnpackPackageDir("system", "/system")
+  script.UnpackPackageDir("data", "/data")
 
   script.Print("Creating symlinks")
   (symlinks, retouch_files) = CopySystemFiles(input_zip, output_zip)
