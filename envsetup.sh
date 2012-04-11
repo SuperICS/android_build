@@ -164,6 +164,11 @@ function setpaths()
     # needed for building linux on MacOS
     # TODO: fix the path
     #export HOST_EXTRACFLAGS="-I "$T/system/kernel_headers/host_include
+    # Regenerated  build.prop
+	echo "Directory of output for Rom..."
+	echo $ANDROID_PRODUCT_OUT
+	echo "Deleting build.prop obsolete..."
+   	rm  $ANDROID_PRODUCT_OUT/system/build.prop
 }
 
 function printconfig()
@@ -218,9 +223,6 @@ function addcompletions()
     if [ ${BASH_VERSINFO[0]} -lt 3 ]; then
         return
     fi
-
-    # Regenerated  build.prop
-    rm -f $ANDROID_PRODUCT_OUT/system/build.prop
 
     dir="sdk/bash_completion"
     if [ -d ${dir} ]; then
