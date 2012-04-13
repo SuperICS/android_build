@@ -408,14 +408,14 @@ def WriteFullOTAPackage(input_zip, output_zip):
   if OPTIONS.wipe_user_data:
     script.Print("Wiping user data")
     script.FormatPartition("/data")
+    script.Mount("/data")
+    script.UnpackPackageDir("data", "/data")
 
   script.Print("Formatting system")
   script.FormatPartition("/system")
   script.Mount("/system")
-  script.Mount("/data")
   script.Print("Installing SuperOSR")
   script.UnpackPackageDir("system", "/system")
-  script.UnpackPackageDir("data", "/data")
 
   script.Print("Creating symlinks")
   (symlinks, retouch_files) = CopySystemFiles(input_zip, output_zip)
