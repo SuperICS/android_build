@@ -1262,12 +1262,19 @@ else
     $(INTERNAL_OTA_PACKAGE_TARGET): copy_user_data := False
 endif
 
+ifeq ($(VENDOR_WIPE_USER_DATA),true)
+    $(INTERNAL_OTA_PACKAGE_TARGET): wipe_user_data := True
+else
+    $(INTERNAL_OTA_PACKAGE_TARGET): wipe_user_data := False
+endif
+
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	@echo "Package OTA: $@"
 	$(OTA_FROM_TARGET_SCRIPT) -v \
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
 	   -c $(copy_user_data) \
+	   -w $(wipe_user_data) \
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
