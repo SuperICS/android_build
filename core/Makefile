@@ -1256,25 +1256,27 @@ else
     $(INTERNAL_OTA_PACKAGE_TARGET): override_device := $(TARGET_OTA_ASSERT_DEVICE)
 endif
 
+ifndef VENDOR_COPY_USER_DATA
+	VENDOR_COPY_USER_DATA := false
+endif
+
 ifeq ($(VENDOR_COPY_USER_DATA),true)
-    $(INTERNAL_OTA_PACKAGE_TARGET): copy_user_data := True
-else
-    $(INTERNAL_OTA_PACKAGE_TARGET): copy_user_data := False
+    $(INTERNAL_OTA_PACKAGE_TARGET): copy_user_data := c
+endif
+
+ifndef VENDOR_WIPE_USER_DATA
+	VENDOR_WIPE_USER_DATA := false
 endif
 
 ifeq ($(VENDOR_WIPE_USER_DATA),true)
-    $(INTERNAL_OTA_PACKAGE_TARGET): wipe_user_data := True
-else
-    $(INTERNAL_OTA_PACKAGE_TARGET): wipe_user_data := False
+    $(INTERNAL_OTA_PACKAGE_TARGET): wipe_user_data := w
 endif
 
 $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(OTATOOLS)
 	@echo "Package OTA: $@"
-	$(OTA_FROM_TARGET_SCRIPT) -v \
+	$(OTA_FROM_TARGET_SCRIPT) -v$(copy_user_data)$(wipe_user_data) \
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
-	   -c $(copy_user_data) \
-	   -w $(wipe_user_data) \
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
