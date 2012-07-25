@@ -50,7 +50,6 @@ GRANDFATHERED_USER_MODULES += \
 	applypatch \
 	app_process \
 	archquery \
-	asm-3.1 \
 	atree \
 	audio \
 	badblocks \
@@ -68,11 +67,11 @@ GRANDFATHERED_USER_MODULES += \
 	cfassembler \
 	check_stack \
 	check_trace \
-	cmu2nuance \
 	com.android.phone.common \
 	com.android.vcard \
 	commons-compress-1.0 \
 	copybit.msm7k \
+	content \
 	copybit.qsd8k \
 	copybit.s5pc110 \
 	coverage \
@@ -125,6 +124,7 @@ GRANDFATHERED_USER_MODULES += \
 	exc_dump \
 	fastboot \
 	framework \
+	framework2 \
 	FrameworkCoreHostTests \
 	frameworks-core-util-lib \
 	fsck_msdos \
@@ -166,14 +166,12 @@ GRANDFATHERED_USER_MODULES += \
 	jsr305lib \
 	junit \
 	jython \
-	keystore \
 	kxml2-2.3.0 \
 	launch-wrapper \
 	layoutlib \
 	layoutlib_api \
 	layoutlib_create \
 	layoutlib_utils \
-	layoutopt \
 	liba2dp \
 	libabi \
 	libandroid \
@@ -221,7 +219,6 @@ GRANDFATHERED_USER_MODULES += \
 	libESR_Portable \
 	libESR_Shared \
 	libETC1 \
-	libexif \
 	libext \
 	libext2_blkid \
 	libext2_blkid_host \
@@ -313,7 +310,6 @@ GRANDFATHERED_USER_MODULES += \
 	libSR_AcousticState \
 	libSR_AudioIn \
 	libSR_Core \
-	libsrec_jni \
 	libSR_EventLog \
 	libSR_G2P \
 	libSR_Grammar \
@@ -448,7 +444,6 @@ GRANDFATHERED_USER_MODULES += \
 	resize2fs \
 	resize2fs_host \
 	rgb2565 \
-	rild \
 	rsg-generator \
 	run-as \
 	runtime \
@@ -475,7 +470,6 @@ GRANDFATHERED_USER_MODULES += \
 	sig-create \
 	signapk \
 	signature-tools \
-	simg2img \
 	spec-progress \
 	sqlite3 \
 	stack_dump \
@@ -497,7 +491,6 @@ GRANDFATHERED_USER_MODULES += \
 	traceview \
 	tune2fs \
 	tune2fs_host \
-	uix \
 	usbtest \
 	vdc \
 	vm-tests \

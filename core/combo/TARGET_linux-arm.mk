@@ -43,8 +43,12 @@ include $(TARGET_ARCH_SPECIFIC_MAKEFILE)
 
 # You can set TARGET_TOOLS_PREFIX to get gcc from somewhere else
 ifeq ($(strip $(TARGET_TOOLS_PREFIX)),)
-TARGET_TOOLS_PREFIX := \
-	prebuilt/$(HOST_PREBUILT_TAG)/toolchain/arm-linux-androideabi-4.4.x/bin/arm-linux-androideabi-
+ifneq ($(strip $(wildcard prebuilts/gcc/$(HOST_PREBUILT_EXTRA_TAG)/arm/arm-linux-androideabi-4.6)),)
+TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_EXTRA_TAG)/arm/arm-linux-androideabi-4.6
+else
+TARGET_TOOLCHAIN_ROOT := prebuilts/gcc/$(HOST_PREBUILT_TAG)/arm/arm-linux-androideabi-4.6
+endif
+TARGET_TOOLS_PREFIX := $(TARGET_TOOLCHAIN_ROOT)/bin/arm-linux-androideabi-
 endif
 
 # Only define these if there's actually a gcc in there.
@@ -101,8 +105,16 @@ endif
 android_config_h := $(call select-android-config-h,linux-arm)
 arch_include_dir := $(dir $(android_config_h))
 
+ifeq ($(TARGET_DISABLE_ARM_PIE),true)
+   PIE_GLOBAL_CFLAGS :=
+   PIE_EXECUTABLE_TRANSFORM := -Wl,-T,$(BUILD_SYSTEM)/armelf.x
+else
+   PIE_GLOBAL_CFLAGS := -fPIE
+   PIE_EXECUTABLE_TRANSFORM := -fPIE -pie
+endif
+
 TARGET_GLOBAL_CFLAGS += \
-			-msoft-float -fpic \
+			-msoft-float -fpic $(PIE_GLOBAL_CFLAGS) \
 			-ffunction-sections \
 			-fdata-sections \
 			-funwind-tables \
@@ -114,11 +126,13 @@ TARGET_GLOBAL_CFLAGS += \
 			-include $(android_config_h) \
 			-I $(arch_include_dir)
 
-# This warning causes dalvik not to build with gcc 4.6 and -Werror.
+# This warning causes dalvik not to build with gcc 4.6.x and -Werror.
 # We cannot turn it off blindly since the option is not available
-# in gcc-4.4.x
-ifneq ($(filter 4.6.0%, $(shell $(TARGET_CC) --version)),)
-TARGET_GLOBAL_CFLAGS += -Wno-unused-but-set-variable
+# in gcc-4.4.x.  We also want to disable sincos optimization globally
+# by turning off the builtin sin function.
+ifneq ($(filter 4.6.%, $(shell $(TARGET_CC) --version)),)
+TARGET_GLOBAL_CFLAGS += -Wno-unused-but-set-variable -fno-builtin-sin \
+			-fno-strict-volatile-bitfields
 endif
 
 # This is to avoid the dreaded warning compiler message:
@@ -133,6 +147,8 @@ TARGET_GLOBAL_CFLAGS += -Wno-psabi
 
 TARGET_GLOBAL_LDFLAGS += \
 			-Wl,-z,noexecstack \
+			-Wl,-z,relro \
+			-Wl,-z,now \
 			-Wl,--icf=safe \
 			$(arch_variant_ldflags)
 
@@ -244,7 +260,7 @@ endif
 
 define transform-o-to-shared-lib-inner
 $(hide) $(PRIVATE_CXX) \
-	-nostdlib -Wl,-soname,$(notdir $@) -Wl,-T,$(BUILD_SYSTEM)/armelf.xsc \
+	-nostdlib -Wl,-soname,$(notdir $@) \
 	-Wl,--gc-sections \
 	-Wl,-shared,-Bsymbolic \
 	$(PRIVATE_TARGET_GLOBAL_LD_DIRS) \
@@ -266,7 +282,7 @@ $(hide) $(PRIVATE_CXX) \
 endef
 
 define transform-o-to-executable-inner
-$(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic -Wl,-T,$(BUILD_SYSTEM)/armelf.x \
+$(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic $(PIE_EXECUTABLE_TRANSFORM) \
 	-Wl,-dynamic-linker,/system/bin/linker \
     -Wl,--gc-sections \
 	-Wl,-z,nocopyreloc \
@@ -287,7 +303,7 @@ $(hide) $(PRIVATE_CXX) -nostdlib -Bdynamic -Wl,-T,$(BUILD_SYSTEM)/armelf.x \
 endef
 
 define transform-o-to-static-executable-inner
-$(hide) $(PRIVATE_CXX) -nostdlib -Bstatic -Wl,-T,$(BUILD_SYSTEM)/armelf.x \
+$(hide) $(PRIVATE_CXX) -nostdlib -Bstatic \
     -Wl,--gc-sections \
 	-o $@ \
 	$(TARGET_GLOBAL_LD_DIRS) \

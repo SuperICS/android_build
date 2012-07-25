@@ -9,6 +9,7 @@ ARCH_ARM_HAVE_CLZ               := true
 ARCH_ARM_HAVE_FFS               := true
 ARCH_ARM_HAVE_ARMV7A            := true
 ifneq ($(strip $(TARGET_ARCH_VARIANT_FPU)),none)
+ARCH_ARM_HAVE_TLS_REGISTER      := true
 ARCH_ARM_HAVE_VFP               := true
 else
 ARCH_ARM_HAVE_VFP               := false

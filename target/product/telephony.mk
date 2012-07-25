@@ -19,7 +19,8 @@
 
 PRODUCT_PACKAGES := \
     Mms \
-    Stk
+    Stk \
+    rild
 
 PRODUCT_COPY_FILES := \
     frameworks/base/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml 
